@@ -1,0 +1,7 @@
+Features
+Add new todos
+Mark todos as complete or incomplete
+Edit existing todos
+Delete todos
+Filter todos by status (all, active, completed)
+Persist state using local storage
