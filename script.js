@@ -12,18 +12,6 @@ const UpdateCount = ()=>{
 
 
 
-const onFilterChange = (event) => {
-    event.preventDefault(); // Prevent the default anchor behavior (page scroll)
-
-    const filterLinks = document.getElementsByClassName('filterLinks');
-    filter = event.target.getAttribute('href').replace('#/', ''); // Extract filter value
-    filterTodos();
-    filterLinks.forEach(link => link.classList.remove('selected'));
-    event.target.classList.add('selected');
-
-}
-
-
 const filterTodos = () => {
     // Define functions to determine if a todo should be included in the filtered list
     const complete = (todo) => todo.isCompleted === true;
@@ -44,6 +32,18 @@ const filterTodos = () => {
     }
     renderTodo(filteredTodos); // Render the filtered list of todos
 };
+const onFilterChange = (event) => {
+    event.preventDefault(); // Prevent the default anchor behavior (page scroll)
+
+    let filterLinks = document.querySelectorAll('.filterLinks');
+    filter = event.target.getAttribute('href').replace('#/', ''); // Extract filter value
+    filterTodos();
+    filterLinks.forEach(link => link.classList.remove('selected'));
+    event.target.classList.add('selected');
+
+}
+
+
 
 
 const createTodo = (todo)=>{
