@@ -1,14 +1,25 @@
 const textbox = document.querySelector('#textbox');
-const todoCountElement = document.getElementById('todo-count');
-let todoCount = 0;
+const todoCountElement = document.getElementById('todoCount');
+let todoTaskCount = 0;
 let todos = [];
 let filter = 'all';
 
 let counter = 0;
-const UpdateCount = ()=>{
-    todoCount++
+const updateCount = (todos)=>{
+    todoTaskCount = 0;
+
+    const todoCountUpdate = (todo) =>{
+           if(todo.isCompleted===false){
+              todoTaskCount++;
+            }
+          
+    }
+     todos.forEach(todoCountUpdate);
+     todoCountElement.innerText = `${todoTaskCount} items left`;
+
 
 }
+
 
 
 
@@ -94,12 +105,10 @@ const onclickEnter = (event) =>{
             createTodo(todo);
             renderTodo(todos);
             
-            UpdateCount();
+            updateCount(todos);
 
             textbox.value = ''; // Clear the textbox after adding the to-do
-
-        }
-
+ }
 }
 }
 
