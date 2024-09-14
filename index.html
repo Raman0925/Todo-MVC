@@ -21,16 +21,16 @@
 				</ul>
 			</section>
 			<footer class="footer">
-				<span class="todo-count"></span>
+				<span class="todo-count" id="todoCount"></span>
 				<ul class="filters">
 					<li>
-						<a href="#/" class="selected">All</a>
+						<a href="#/"  class="selected filterLinks" onclick="onFilterChange(event)">All</a>
 					</li>
 					<li>
-						<a href="#/active">Active</a>
+						<a href="#/active" class="filterLinks" onclick="onFilterChange(event)">Active</a>
 					</li>
 					<li>
-						<a href="#/completed">Completed</a>
+						<a href="#/completed" class="filterLinks" onclick="onFilterChange(event)">Completed</a>
 					</li>
 				</ul>
 				<button class="clear-completed">Clear completed</button>
