@@ -1,120 +1,168 @@
-const textbox = document.querySelector('#textbox');
-const todoCountElement = document.getElementById('todoCount');
-let todoTaskCount = 0;
+const textbox = document.querySelector("#textbox");
+const container = document.querySelector(".todo-list");
+const footerList = document.querySelector(".footer");
+const counter = document.getElementById("todoCount");
+const clearCompletedButton = document.querySelector(".clear-completed");
+const toggleAll = document.querySelector(".toggle-all");
+const filterLinks = document.querySelectorAll(".filterLinks");
 let todos = [];
-let filter = 'all';
+let id = Date.now(); 
 
-let counter = 0;
-const updateCount = (todos)=>{
-    todoTaskCount = 0;
+// Filter todos based on the active filter
+const filterTodos = (filter) => {
+  const complete = (todo) => todo.isCompleted === true;
+  const notComplete = (todo) => todo.isCompleted === false;
 
-    const todoCountUpdate = (todo) =>{
-           if(todo.isCompleted===false){
-              todoTaskCount++;
-            }
-          
-    }
-     todos.forEach(todoCountUpdate);
-     todoCountElement.innerText = `${todoTaskCount} items left`;
-
-
-}
-
-
-
-
-const filterTodos = () => {
-    // Define functions to determine if a todo should be included in the filtered list
-    const complete = (todo) => todo.isCompleted === true;
-    const notComplete = (todo) => todo.isCompleted === false;
-
-    let filteredTodos;
-    switch (filter) {
-        case 'completed':
-            filteredTodos = todos.filter(complete); // Use `complete` function to filter todos
-            break;
-        case 'active':
-            filteredTodos = todos.filter(notComplete); // Use `notComplete` function to filter todos
-            break;
-        case 'all':
-        default:
-            filteredTodos = todos; // No filtering for 'all'
-            break;
-    }
-    renderTodo(filteredTodos); // Render the filtered list of todos
+  let filteredTodos;
+  switch (filter) {
+    case "completed":
+      filteredTodos = todos.filter(complete);
+      break;
+    case "active":
+      filteredTodos = todos.filter(notComplete);
+      break;
+    case "":
+    default:
+      filteredTodos = todos;
+      break;
+  }
+  renderTodo(filteredTodos);
 };
+
+// Handle filter change when a link is clicked
 const onFilterChange = (event) => {
-    event.preventDefault(); // Prevent the default anchor behavior (page scroll)
+  const filter = event.target.getAttribute("href").replace("#/", "");
+  filterTodos(filter);
+  filterLinks.forEach((link) => link.classList.remove("selected"));
+  event.target.classList.add("selected");
+};
 
-    let filterLinks = document.querySelectorAll('.filterLinks');
-    filter = event.target.getAttribute('href').replace('#/', ''); // Extract filter value
-    filterTodos();
-    filterLinks.forEach(link => link.classList.remove('selected'));
-    event.target.classList.add('selected');
+// Clear completed todos
+const clearCompleted = () => {
+  todos = todos.filter(todo => !todo.isCompleted);
+  renderTodo(todos);
+};
 
-}
+// Count remaining todos
+const itemCount = () => {
+  return todos.filter(todo => !todo.isCompleted).length;
+};
 
+// Create a new todo
+const createTodo = (todo) => {
+  todos.push(todo);
+};
 
-
-
-const createTodo = (todo)=>{
-    counter++
-    todos.push({id : counter,
-        task:todo,
-        isCompleted : false
-    })}
-
-
-const renderTodo = (todos) => {
-    const container = document.querySelector('.todo-list');
-    container.innerHTML = ''; // Clear existing item
-    todos.forEach(element => {
-        const view = document.createElement('li');
-        view.classList.add('view')
-        const CheckElement =  document.createElement('input');
-        CheckElement.type = 'checkbox';
-        if(element.isCompleted===true){
-            CheckElement.checked = true;
-        }
-        CheckElement.classList.add('toggle');
-        const label =  document.createElement('label');
-        label.textContent = element.task;
-        label.classList.add('label');
-        const destroyButton =  document.createElement('button');
-        destroyButton.classList.add('destroy');
-        view.append(CheckElement,label,destroyButton);
-        let container = document.querySelector('.todo-list');
-        container.append(view);
-        
-    });
-
-
-
+// Edit an existing todo
+const EditTodo = (event) => {
+  if (event.target.tagName === "LABEL") {
+    const currentLabel = event.target;
+    const editInput = document.createElement("input");
+    editInput.classList.add("edit_input");
+    editInput.value = currentLabel.textContent;
+    currentLabel.parentElement.replaceChild(editInput, currentLabel);
     
-}
+    editInput.addEventListener("keydown", (eve) => {
+      if (eve.key === "Enter" && editInput.value.trim() !== "") {
+        finishEdit(currentLabel, editInput);
+      }
+    });
+  }
+};
 
-const onclickEnter = (event) =>{
-   
-    if (event.key === 'Enter') {
+// Finish editing a todo
+const finishEdit = (currentLabel, editInput) => {
+  currentLabel.textContent = editInput.value;
+  editInput.parentElement.replaceChild(currentLabel, editInput);
+  updateTodoName(currentLabel);
+  renderTodo(todos);
+};
 
+// Toggle completion of all todos
+const toggleAllInput = () => {
+  const allDone = todos.every(todo => todo.isCompleted);
+  todos.forEach(todo => {
+    todo.isCompleted = !allDone;
+  });
+  renderTodo(todos);
+};
 
-        const todo = textbox.value;
-         
-        if (todo.trim() !== '') { // Checking if the input is not empty
-            
-            createTodo(todo);
-            renderTodo(todos);
-            
-            updateCount(todos);
+// Delete a todo
+const deleteTodo = (event) => {
+  const target = event.target;
+  todos = todos.filter(todo => todo.id !== parseInt(target.parentElement.dataset.id));
+  renderTodo(todos);
+};
 
-            textbox.value = ''; // Clear the textbox after adding the to-do
- }
-}
-}
+// Update todo name after editing
+const updateTodoName = (currentLabel) => {
+  const todoId = parseInt(currentLabel.parentElement.dataset.id);
+  todos.forEach(todo => {
+    if (todo.id === todoId) {
+      todo.name = currentLabel.textContent;
+    }
+  });
+};
 
+// Render todos in the UI
+const renderTodo = (todos) => {
+  container.innerHTML = ""; // Clear existing items
+  todos.forEach((todo) => {
+    const view = document.createElement("li");
+    view.setAttribute("data-id", todo.id);
+    view.classList.add("view");
+    if (todo.isCompleted) {
+      view.classList.add("completed");
+    }
 
+    const checkElement = document.createElement("input");
+    checkElement.type = "checkbox";
+    checkElement.checked = todo.isCompleted;
+    checkElement.classList.add("toggle")
+    checkElement.addEventListener("click", completeIndividualTask);
+    
+    const label = document.createElement("label");
+    label.textContent = todo.name;
+    label.classList.add("label")
+    label.addEventListener("dblclick", EditTodo);
+    
+    const destroyButton = document.createElement("button");
+    destroyButton.classList.add("destroy");
+    destroyButton.addEventListener("click", deleteTodo);
 
+    view.append(checkElement, label, destroyButton);
+    container.append(view);
+  });
 
+  // Update the item count
+  counter.textContent = `${itemCount()} items left`;
+};
 
+// Handle pressing "Enter" to add a new todo
+const onclickEnter = (event) => {
+  if (event.key === "Enter" && event.target.value.trim() !== "") {
+    const todo = {
+      name: event.target.value,
+      isCompleted: false,
+      id: ++id,
+    };
+    createTodo(todo);
+    event.target.value = "";
+    renderTodo(todos);
+  }
+};
 
-textbox.addEventListener('keypress',onclickEnter );
+// Event listeners
+textbox.addEventListener("keypress", onclickEnter);
+toggleAll.addEventListener("change", toggleAllInput);
+clearCompletedButton.addEventListener("click", clearCompleted);
+filterLinks.forEach(link => link.addEventListener("click", onFilterChange));
+
+// Handle individual task completion
+const completeIndividualTask = (event) => {
+  const liTodos = event.target.closest("li");
+  const todoId = parseInt(liTodos.dataset.id);
+  const todo = todos.find(todo => todo.id === todoId);
+  todo.isCompleted = event.target.checked;
+  renderTodo(todos);
+};
