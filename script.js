@@ -5,13 +5,16 @@ const counter = document.getElementById("todoCount");
 const clearCompletedButton = document.querySelector(".clear-completed");
 const toggleAll = document.querySelector(".toggle-all");
 const filterLinks = document.querySelectorAll(".filterLinks");
-let todos = [];
+let todos = JSON.parse(localStorage.getItem('todos')) || []; 
 let id = Date.now(); 
 
 // Filter todos based on the active filter
 const filterTodos = (filter) => {
   const complete = (todo) => todo.isCompleted === true;
   const notComplete = (todo) => todo.isCompleted === false;
+
+
+
 
   let filteredTodos;
   switch (filter) {
@@ -28,7 +31,9 @@ const filterTodos = (filter) => {
   }
   renderTodo(filteredTodos);
 };
-
+const saveTodosToLocalStorage = () => {
+  localStorage.setItem('todos', JSON.stringify(todos)); // Save todos to local storage
+};
 // Handle filter change when a link is clicked
 const onFilterChange = (event) => {
   const filter = event.target.getAttribute("href").replace("#/", "");
@@ -40,7 +45,8 @@ const onFilterChange = (event) => {
 // Clear completed todos
 const clearCompleted = () => {
   todos = todos.filter(todo => !todo.isCompleted);
-  renderTodo(todos);
+  saveTodosToLocalStorage();
+   renderTodo(todos);
 };
 
 // Count remaining todos
@@ -50,6 +56,8 @@ const itemCount = () => {
 
 // Create a new todo
 const createTodo = (todo) => {
+  saveTodosToLocalStorage(); 
+
   todos.push(todo);
 };
 
@@ -75,6 +83,8 @@ const finishEdit = (currentLabel, editInput) => {
   currentLabel.textContent = editInput.value;
   editInput.parentElement.replaceChild(currentLabel, editInput);
   updateTodoName(currentLabel);
+  saveTodosToLocalStorage(); 
+
   renderTodo(todos);
 };
 
@@ -84,6 +94,7 @@ const toggleAllInput = () => {
   todos.forEach(todo => {
     todo.isCompleted = !allDone;
   });
+  saveTodosToLocalStorage(); 
   renderTodo(todos);
 };
 
@@ -91,6 +102,8 @@ const toggleAllInput = () => {
 const deleteTodo = (event) => {
   const target = event.target;
   todos = todos.filter(todo => todo.id !== parseInt(target.parentElement.dataset.id));
+  saveTodosToLocalStorage();
+
   renderTodo(todos);
 };
 
@@ -164,5 +177,9 @@ const completeIndividualTask = (event) => {
   const todoId = parseInt(liTodos.dataset.id);
   const todo = todos.find(todo => todo.id === todoId);
   todo.isCompleted = event.target.checked;
+  saveTodosToLocalStorage();
+
   renderTodo(todos);
 };
+
+renderTodo(todos);
