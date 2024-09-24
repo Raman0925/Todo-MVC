@@ -162,8 +162,10 @@ const onclickEnter = (event) => {
       id: ++id,
     };
     createTodo(todo);
-    event.target.value = "";
+    event.target.value = ""; 
     renderTodo(todos);
+    saveTodosToLocalStorage();
+
   }
 };
 
