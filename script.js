@@ -6,7 +6,7 @@ const clearCompletedButton = document.querySelector(".clear-completed");
 const toggleAll = document.querySelector(".toggle-all");
 const filterLinks = document.querySelectorAll(".filterLinks");
 let todos = JSON.parse(localStorage.getItem('todos')) || []; 
-let id = Date.now(); 
+let id = localStorage.getItem('lastId') ? parseInt(localStorage.getItem('lastId')) : Date.now();
 
 // Filter todos based on the active filter
 const filterTodos = (filter) => {
@@ -56,9 +56,11 @@ const itemCount = () => {
 
 // Create a new todo
 const createTodo = (todo) => {
-  saveTodosToLocalStorage(); 
-
   todos.push(todo);
+  saveTodosToLocalStorage(); 
+  localStorage.setItem('lastId', id);
+
+
 };
 
 // Edit an existing todo
