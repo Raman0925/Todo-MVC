@@ -68,7 +68,7 @@ const EditTodo = (event) => {
   if (event.target.tagName === "LABEL") {
     const currentLabel = event.target;
     const editInput = document.createElement("input");
-    editInput.classList.add("edit_input");
+    editInput.classList.add("edit");
     editInput.value = currentLabel.textContent;
     currentLabel.parentElement.replaceChild(editInput, currentLabel);
     
